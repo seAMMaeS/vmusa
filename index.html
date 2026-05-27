@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>5x5 TCG Card Grid | Trading Card Game Style</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%);
+      font-family: 'Segoe UI', 'Roboto', 'Trebuchet MS', system-ui, sans-serif;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Main container with subtle card table feel */
+    .tcg-container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 2rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(2px);
+      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+    }
+
+    /* 5x5 Grid : exactly 5 columns, 5 rows (auto generates rows) */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 1.25rem;
+      justify-items: center;
+      align-items: stretch;
+    }
+
+    /* Individual TCG Card Styling */
+    .tcg-card {
+      background: #fef7e8;
+      background-image: radial-gradient(circle at 10% 20%, rgba(255,245,215,0.8) 2%, #f4e5c7 90%);
+      border-radius: 1rem;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3), 0 0 0 2px #d4af7a, 0 0 0 5px #2c1e12;
+      transition: all 0.25s ease-in-out;
+      cursor: pointer;
+      width: 100%;
+      max-width: 220px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Hover effect: lift & glow like a real TCG rare card */
+    .tcg-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 18px 28px rgba(0, 0, 0, 0.4), 0 0 0 2px #ffd966, 0 0 0 5px #5a3e1b;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    /* Card Art / Image area */
+    .card-art {
+      background: #2c3e2f;
+      height: 140px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      border-bottom: 3px solid #c9aa5f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Rarity shimmer effect on art (optional overlay) */
+    .card-art::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(transparent 50%, rgba(255,215,0,0.15));
+      pointer-events: none;
+    }
+
+    /* Card info area */
+    .card-info {
+      padding: 0.85rem 0.75rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      flex: 1;
+    }
+
+    /* Header row: name + mana cost */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px dashed #c0a15e;
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.3px;
+      color: #2c1810;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(255,255,200,0.6);
+    }
+
+    .mana-cost {
+      background: #1e2a36;
+      color: #f3d382;
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 30px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px black;
+      font-family: monospace;
+    }
+
+    /* Card type line (e.g., Creature, Spell) */
+    .card-type {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #7a5a3a;
+      letter-spacing: 0.5px;
+      background: #e9dbc9;
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 12px;
+      align-self: flex-start;
+    }
+
+    /* Flavour / description text */
+    .card-flavour {
+      font-size: 0.7rem;
+      color: #4a3a28;
+      font-style: italic;
+      line-height: 1.3;
+      margin: 0.2rem 0;
+      height: 2.6rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Stats row: attack / defense / loyalty etc */
+    .card-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.3rem;
+      border-top: 1px solid #e2ceaa;
+      padding-top: 0.4rem;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .attack {
+      color: #b13e3e;
+      background: #2a1a10;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-family: monospace;
+    }
+
+    .defense {
+      color: #2f6b3c;
+      background: #1f2a18;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-family: monospace;
+    }
+
+    /* Responsive: For tablets, keep 5 columns but shrink gap/font */
+    @media (max-width: 1100px) {
+      .card-grid {
+        gap: 0.8rem;
+      }
+      .card-art {
+        height: 120px;
+      }
+      .card-name {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* On narrower screens, allow horizontal scroll to preserve 5x5 layout */
+    @media (max-width: 950px) {
+      body {
+        padding: 1rem;
+      }
+      .tcg-container {
+        overflow-x: auto;
+        padding: 1rem;
+      }
+      .card-grid {
+        min-width: 860px;   /* ensures 5 columns remain visible */
+        gap: 0.9rem;
+      }
+    }
+
+    /* For very small devices, keep readability */
+    @media (max-width: 600px) {
+      .card-grid {
+        min-width: 780px;
+      }
+      .card-art {
+        height: 100px;
+      }
+    }
+
+    /* Optional title & header for the TCG grid */
+    .tcg-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #f9e2b7;
+      text-shadow: 0 4px 8px black;
+    }
+    .tcg-header h1 {
+      font-size: 2rem;
+      letter-spacing: 3px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f9e0a0, #d4a373);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .tcg-header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* simulate card back on hover tooltip? not needed, but add subtle click feedback */
+    .tcg-card:active {
+      transform: scale(0.98);
+      transition: 0.05s;
+    }
+
+    /* utility for different art backgrounds (random fantasy pics via unsplash placeholder) */
+    /* each card gets a unique background via inline style in HTML, but we can use placeholders */
+  </style>
+</head>
+<body>
+<div class="tcg-container">
+  <div class="tcg-header">
+    <h1>⚔️ CHRONICLE OF 5×5 ⚔️</h1>
+    <p>★ Trading Card Game Grid — 25 legendary cards ★</p>
+  </div>
+  <div class="card-grid" id="tcgGrid">
+    <!-- 25 cards will be injected via JavaScript to keep markup clean and editable -->
+  </div>
+</div>
+
+<script>
+  // ------------------------------------------------------------------
+  // TCG Card dataset for 5x5 grid (25 unique cards)
+  // Each card has: name, mana, type, flavour, attack, defense, artId
+  // Using placekitten or loremflick? Better: use placeholder images from picsum with fantasy IDs
+  // For consistent visual we use LoremFlick? Actually we'll use free unsplash random nature/fantasy via "picsum" but with themed IDs.
+  // We'll use Cloudimage's to get consistent but varied fantasy-ish images: picsum with ids based on index.
+  // Also we can embed svg patterns but simple: "https://picsum.photos/id/{id}/200/140" where ids give fantasy-like random.
+  // Choose picsum IDs that look like landscapes/mountains/forest (fantasy vibe)
+  // ------------------------------------------------------------------
+  const cardsData = [
+    { name: "Emberdrake", mana: "🔥3", type: "Dragon • Fire", flavour: "Wings melt the northern peaks.", attack: "⚔️ 5", defense: "🛡️ 4" },
+    { name: "Frostweaver", mana: "❄️2", type: "Elemental • Ice", flavour: "She freezes time itself.", attack: "⚔️ 3", defense: "🛡️ 5" },
+    { name: "Gloom Stalker", mana: "🌑1", type: "Rogue • Shadow", flavour: "Silent as the grave.", attack: "⚔️ 4", defense: "🛡️ 2" },
+    { name: "Sanctum Paladin", mana: "✨3", type: "Knight • Light", flavour: "Unyielding faith, unbreakable shield.", attack: "⚔️ 3", defense: "🛡️ 6" },
+    { name: "Vineheart Treant", mana: "🌿4", type: "Plant • Ancient", flavour: "Roots drink invader's blood.", attack: "⚔️ 4", defense: "🛡️ 7" },
+    { name: "Cinder Witch", mana: "🔥2", type: "Shaman • Pyro", flavour: "Curses written in ash.", attack: "⚔️ 4", defense: "🛡️ 3" },
+    { name: "Tidecaller", mana: "💧3", type: "Merfolk • Ocean", flavour: "Commands leviathans.", attack: "⚔️ 5", defense: "🛡️ 3" },
+    { name: "Iron Golem", mana: "⚙️5", type: "Construct", flavour: "March of the automaton legion.", attack: "⚔️ 6", defense: "🛡️ 6" },
+    { name: "Lunar Prophet", mana: "🌙2", type: "Cleric • Moon", flavour: "Reads fate in eclipses.", attack: "⚔️ 2", defense: "🛡️ 4" },
+    { name: "Storm Phoenix", mana: "⚡4", type: "Bird • Thunder", flavour: "Reborn in lightning.", attack: "⚔️ 7", defense: "🛡️ 3" },
+    { name: "Abyssal Horror", mana: "🌀5", type: "Elder • Abyss", flavour: "From the depths of madness.", attack: "⚔️ 8", defense: "🛡️ 5" },
+    { name: "Glimmer Sprite", mana: "✨1", type: "Fairy", flavour: "Grants wishes for a price.", attack: "⚔️ 1", defense: "🛡️ 1" },
+    { name: "Dread Knight", mana: "💀3", type: "Undead • Cavalry", flavour: "Souls bound to cursed steel.", attack: "⚔️ 5", defense: "🛡️ 4" },
+    { name: "Mossbeard Elder", mana: "🌿2", type: "Druid", flavour: "Knows the forest's secrets.", attack: "⚔️ 2", defense: "🛡️ 5" },
+    { name: "Arcane Tempest", mana: "🌀4", type: "Sorcerer", flavour: "Magic storms follow her.", attack: "⚔️ 5", defense: "🛡️ 4" },
+    { name: "Stoneback Basilisk", mana: "🪨3", type: "Beast", flavour: "One glance turns you to granite.", attack: "⚔️ 4", defense: "🛡️ 5" },
+    { name: "Pyre Fox", mana: "🔥2", type: "Spirit", flavour: "Dances on embers.", attack: "⚔️ 3", defense: "🛡️ 2" },
+    { name: "Rime Oracle", mana: "❄️3", type: "Prophet", flavour: "Ice reveals truth.", attack: "⚔️ 2", defense: "🛡️ 5" },
+    { name: "Doomforge Giant", mana: "⚙️6", type: "Giant • Smith", flavour: "Hammer strikes like thunder.", attack: "⚔️ 8", defense: "🛡️ 7" },
+    { name: "Starlight Unicorn", mana: "✨3", type: "Mythic", flavour: "Heals with a touch.", attack: "⚔️ 3", defense: "🛡️ 4" },
+    { name: "Venomtail Scorpion", mana: "🌑2", type: "Insect", flavour: "Last sting is agony.", attack: "⚔️ 4", defense: "🛡️ 2" },
+    { name: "Forge Cleric", mana: "✨2", type: "Artificer", flavour: "Blesses weapons of war.", attack: "⚔️ 2", defense: "🛡️ 4" },
+    { name: "Nightmare Steed", mana: "💀4", type: "Nightmare", flavour: "Hooves of despair.", attack: "⚔️ 5", defense: "🛡️ 4" },
+    { name: "Earthshaker", mana: "🪨5", type: "Elemental", flavour: "Tremors break the lines.", attack: "⚔️ 6", defense: "🛡️ 6" },
+    { name: "Soul Shepherd", mana: "✨2", type: "Spirit guide", flavour: "Leads lost souls home.", attack: "⚔️ 1", defense: "🛡️ 6" }
+  ];
+
+  // Ensure we have exactly 25 cards. cardsData.length = 25, good!
+  // For art, we map images from picsum with IDs that look fantasy (mountains, forests, dark, etc)
+  // Use different IDs per card for varied art: 15, 20, 22, 26, 33, 42, 55, 58, 66, 75, 80, 90, 100, 104, 116, 120, 137, 146, 155, 166, 177, 188, 190, 200, 210
+  const artIds = [15, 20, 22, 26, 33, 42, 55, 58, 66, 75, 80, 90, 100, 104, 116, 120, 137, 146, 155, 166, 177, 188, 190, 200, 210];
+  
+  const gridContainer = document.getElementById('tcgGrid');
+  
+  // generate all 25 cards
+  for (let i = 0; i < cardsData.length; i++) {
+    const card = cardsData[i];
+    const artId = artIds[i % artIds.length];
+    // use picsum with grayscale? no, retain color but maybe add crosshatch effect?
+    // high quality nature / mountains / castles: IDs good for fantasy theme
+    const artUrl = `https://picsum.photos/id/${artId}/300/180`; // will be resized via CSS
+    
+    // Create card element
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'tcg-card';
+    
+    // inner structure
+    cardDiv.innerHTML = `
+      <div class="card-art" style="background-image: url('${artUrl}'); background-size: cover; background-position: center;">
+        <!-- optional decorative gem -->
+      </div>
+      <div class="card-info">
+        <div class="card-header">
+          <span class="card-name">${card.name}</span>
+          <span class="mana-cost">${card.mana}</span>
+        </div>
+        <div class="card-type">${card.type}</div>
+        <div class="card-flavour">“${card.flavour}”</div>
+        <div class="card-stats">
+          <span class="attack">${card.attack}</span>
+          <span class="defense">${card.defense}</span>
+        </div>
+      </div>
+    `;
+    
+    // tiny tooltip on hover showing rarity (optional)
+    cardDiv.setAttribute('title', `${card.name} — ${card.type} | ${card.flavour}`);
+    gridContainer.appendChild(cardDiv);
+  }
+  
+  // extra: if any remaining placeholders? data length = 25 exactly so fine.
+  // Add interactive console log for click (deckbuilder style)
+  document.querySelectorAll('.tcg-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // just an interactive feedback: you can collect cards, for demo we console
+      const cardName = card.querySelector('.card-name')?.innerText || 'unknown';
+      console.log(`🃏 Card selected: ${cardName} — would add to deck / display detail`);
+      // optional subtle alert replace? better not intrusive, but we give a small ripple effect
+      card.style.transform = 'scale(0.98)';
+      setTimeout(() => { card.style.transform = ''; }, 120);
+    });
+  });
+</script>
+</body>
+</html>
